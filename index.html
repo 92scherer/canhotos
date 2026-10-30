@@ -3,649 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movexa - Gestão de Canhotos</title>
-    <!-- Tailwind CSS -->
+    <title>MOVEXA - Gestão de Canhotos de Entregas</title>
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        movexa: {
-                            50: '#fafafa',
-                            100: '#f4f4f5',
-                            500: '#f97316',
-                            600: '#ea580c',
-                            bg: '#09090b', // Preto Profundo
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b; /* Preto Absoluto */
-            background-image: radial-gradient(#27272a 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-color: #09090b;
+            color: #f4f4f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+        .fade-in {
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Modal backdrop Blur */
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(8px);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #18181b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #52525b;
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col justify-between p-4 sm:p-6 antialiased">
+<body class="antialiased selection:bg-orange-500 selection:text-white flex flex-col justify-between min-h-screen">
 
-    <!-- Container Principal Centrado -->
-    <div class="max-w-3xl w-full mx-auto my-auto space-y-6">
+    <!-- MAIN CONTAINER -->
+    <div class="w-full max-w-4xl mx-auto px-4 py-6 flex-grow flex flex-col">
 
-        <!-- Header / Logo Centralizado -->
-        <header class="text-center space-y-3 pt-2">
-            <div class="inline-block bg-zinc-900 p-3 rounded-2xl shadow-2xl border border-zinc-800">
-                <!-- Tag da Imagem da Logo 'logo.jpeg' com fallback visual -->
-                <img id="logoImg" src="logo.jpeg" alt="Movexa Logo" 
+        <!-- CABEÇALHO COM LOGO MAIOR NO CANTO DIREITO -->
+        <header class="mb-8 pb-6 border-b border-zinc-800 flex flex-row items-center justify-between gap-4">
+            <!-- Título e Subtítulo à Esquerda -->
+            <div class="flex-1">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block w-3 h-3 rounded-full bg-orange-500 animate-pulse"></span>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white uppercase">
+                        Gestão de <span class="text-orange-500">Canhotos</span>
+                    </h1>
+                </div>
+                <p class="text-zinc-400 text-xs sm:text-sm mt-1 font-medium">
+                    Sistema de Registro e Consulta de Entregas
+                </p>
+            </div>
+
+            <!-- Logo Movexa no Canto Direito (Aumentado) -->
+            <div class="flex-shrink-0 flex items-center justify-end">
+                <img src="logo.jpeg" alt="Movexa Logo" 
                      onerror="this.onerror=null; this.classList.add('hidden'); document.getElementById('logoFallback').classList.remove('hidden');" 
-                     class="h-16 sm:h-20 object-contain mx-auto">
+                     class="h-16 sm:h-24 md:h-28 max-w-[200px] sm:max-w-[260px] object-contain rounded-lg shadow-md border border-zinc-800/60 bg-zinc-900/50 p-1">
                 
-                <!-- Fallback se logo.jpeg ainda não existir -->
-                <div id="logoFallback" class="hidden flex items-center justify-center gap-2 px-4 py-2 text-2xl font-black text-orange-500 uppercase tracking-wider">
-                    <i class="fa-solid fa-truck-fast"></i> MOVEXA
+                <!-- Fallback caso a imagem logo.jpeg ainda não esteja no servidor -->
+                <div id="logoFallback" class="hidden flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-3 rounded-xl shadow-inner">
+                    <i class="fa-solid fa-truck-fast text-orange-500 text-2xl"></i>
+                    <span class="font-black text-xl tracking-wider text-white">MOVEXA</span>
                 </div>
             </div>
-            <p class="text-zinc-400 text-xs sm:text-sm font-medium">Sistema de Controle de Canhotos de Entrega</p>
         </header>
 
-        <!-- ================= TELA INICIAL (MENU PRINCIPAL) ================= -->
-        <section id="screenHome" class="bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-800 p-6 sm:p-8 space-y-6">
-            <div class="text-center border-b border-zinc-800 pb-4">
-                <h2 class="text-xl sm:text-2xl font-bold text-white">Menu Principal</h2>
-                <p class="text-xs sm:text-sm text-zinc-400 mt-1">Escolha uma opção abaixo para prosseguir</p>
+        <!-- AVISO TOAST / ALERTA DE NOTIFICAÇÃO -->
+        <div id="toast" class="hidden mb-6 p-4 rounded-xl border text-sm font-semibold flex items-center justify-between transition-all duration-300 shadow-xl">
+            <div class="flex items-center gap-3">
+                <i id="toastIcon" class="fa-solid text-lg"></i>
+                <span id="toastMessage"></span>
             </div>
-
-            <!-- Botões Principais de Navegação -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <button id="btnGoAdd" class="group bg-gradient-to-br from-orange-600 to-orange-700 hover:from-orange-500 hover:to-orange-600 text-white rounded-xl p-6 shadow-lg hover:shadow-orange-950/40 transition-all duration-200 flex flex-col items-center justify-center text-center gap-3 border border-orange-500/30">
-                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-camera text-2xl text-white"></i>
-                    </div>
-                    <div>
-                        <span class="block text-lg font-bold">Adicionar Canhoto</span>
-                        <span class="text-xs text-orange-100 font-normal">Registrar nova entrega e foto</span>
-                    </div>
-                </button>
-
-                <button id="btnGoSearch" class="group bg-zinc-800 hover:bg-zinc-700/80 text-white rounded-xl p-6 shadow-lg transition-all duration-200 flex flex-col items-center justify-center text-center gap-3 border border-zinc-700">
-                    <div class="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform text-orange-400">
-                        <i class="fa-solid fa-magnifying-glass text-2xl"></i>
-                    </div>
-                    <div>
-                        <span class="block text-lg font-bold">Buscar Canhoto</span>
-                        <span class="text-xs text-zinc-400 font-normal">Consultar por placa e data</span>
-                    </div>
-                </button>
-            </div>
-
-            <!-- Painel de Gerenciamento e Backup -->
-            <div class="bg-zinc-950/80 rounded-xl p-4 sm:p-5 border border-zinc-800 space-y-3">
-                <div class="flex items-center gap-2 text-zinc-200 font-semibold text-xs sm:text-sm">
-                    <i class="fa-solid fa-database text-orange-500"></i>
-                    <span>Backup e Segurança dos Dados</span>
-                </div>
-                <p class="text-[11px] sm:text-xs text-zinc-400">
-                    Todos os canhotos ficam salvos neste dispositivo. Utilize o backup para transferir os dados para outro computador ou celular.
-                </p>
-                <div class="flex flex-wrap gap-2 pt-1">
-                    <button id="btnExportBackup" class="flex-1 min-w-[130px] bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 font-medium px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-2 shadow-sm transition-colors">
-                        <i class="fa-solid fa-download text-orange-500"></i> Fazer Backup (JSON)
-                    </button>
-                    <label class="flex-1 min-w-[130px] bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 font-medium px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer">
-                        <i class="fa-solid fa-upload text-blue-400"></i> Restaurar Backup
-                        <input type="file" id="inputRestoreBackup" accept=".json" class="hidden">
-                    </label>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TELA: ADICIONAR CANHOTO ================= -->
-        <section id="screenAdd" class="hidden bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-800 p-6 sm:p-8 space-y-6">
-            <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-                <div>
-                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-circle-plus text-orange-500"></i> Adicionar Canhoto
-                    </h2>
-                    <p class="text-xs text-zinc-400">Preencha os dados abaixo e tire a foto do canhoto</p>
-                </div>
-                <button class="btnHome text-zinc-500 hover:text-zinc-300 p-1" title="Voltar">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-
-            <form id="formAddReceipt" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1">Dia da Entrega *</label>
-                        <input type="date" id="addDate" required class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg p-3 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1">Placa do Veículo / Motorista *</label>
-                        <input type="text" id="addPlate" placeholder="Ex: ABC-1D23" required class="w-full bg-zinc-950 border border-zinc-800 text-white rounded-lg p-3 text-sm uppercase focus:ring-2 focus:ring-orange-500 focus:outline-none">
-                    </div>
-                </div>
-
-                <!-- Campo de Upload / Captura de Imagem -->
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-300 mb-1">Foto do Canhoto *</label>
-                    <label for="addPhotoInput" class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-zinc-700 rounded-xl cursor-pointer bg-zinc-950 hover:bg-zinc-800/50 transition-colors">
-                        <div class="flex flex-col items-center justify-center p-4 text-center">
-                            <i class="fa-solid fa-camera text-3xl text-orange-500 mb-2"></i>
-                            <span class="text-xs font-semibold text-zinc-200">Clique para tirar foto ou selecionar arquivo</span>
-                            <span class="text-[10px] text-zinc-500 mt-0.5">Disponível para câmeras de celular ou computador</span>
-                        </div>
-                        <input id="addPhotoInput" type="file" accept="image/*" capture="environment" class="hidden" required />
-                    </label>
-
-                    <!-- Preview da Imagem -->
-                    <div id="addPhotoPreviewContainer" class="hidden mt-3 relative rounded-xl border border-zinc-800 overflow-hidden bg-black flex justify-center items-center max-h-56">
-                        <img id="addPhotoPreview" src="" alt="Preview Canhoto" class="max-h-56 object-contain">
-                        <button type="button" id="btnRemoveAddPhoto" class="absolute top-2 right-2 bg-rose-600 text-white rounded-full p-2 hover:bg-rose-700 transition-colors shadow" title="Remover Foto">
-                            <i class="fa-solid fa-trash text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Botões de Ação do Form -->
-                <div class="pt-4 border-t border-zinc-800 flex items-center justify-end gap-3">
-                    <button type="button" class="btnHome px-4 py-2.5 text-xs font-semibold text-zinc-300 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors">
-                        Cancelar
-                    </button>
-                    <button type="submit" id="btnSaveReceipt" class="px-6 py-2.5 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg shadow-md transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Salvar Canhoto
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- ================= TELA: BUSCAR CANHOTO ================= -->
-        <section id="screenSearch" class="hidden bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-800 p-6 sm:p-8 space-y-6">
-            <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
-                <div>
-                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-magnifying-glass text-orange-500"></i> Buscar Canhotos
-                    </h2>
-                    <p class="text-xs text-zinc-400">Informe a placa e/ou a data para localizar o comprovante</p>
-                </div>
-                <button class="btnHome text-zinc-500 hover:text-zinc-300 p-1" title="Voltar">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-
-            <!-- Formulário de Filtro -->
-            <form id="formSearchReceipt" class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Placa do Veículo</label>
-                        <input type="text" id="searchPlate" placeholder="Digite a placa..." class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg p-2.5 text-xs uppercase focus:ring-2 focus:ring-orange-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-bold uppercase tracking-wider text-zinc-400 mb-1">Dia da Entrega</label>
-                        <input type="date" id="searchDate" class="w-full bg-zinc-900 border border-zinc-700 text-white rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-2 pt-1">
-                    <button type="button" id="btnClearSearch" class="px-3 py-2 text-xs font-medium text-zinc-400 hover:text-white underline">
-                        Limpar Filtros
-                    </button>
-                    <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-orange-600 hover:bg-orange-500 rounded-lg shadow transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-filter"></i> Buscar Canhoto(s)
-                    </button>
-                </div>
-            </form>
-
-            <!-- Área de Resultados -->
-            <div class="space-y-3">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Resultados da Busca</h3>
-                    <span id="searchResultCount" class="text-xs text-zinc-500 font-medium">0 encontrados</span>
-                </div>
-
-                <div id="searchResultsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Cards de Canhotos gerados dinamicamente via JS -->
-                </div>
-
-                <!-- Estado Vazio -->
-                <div id="searchEmptyState" class="py-10 text-center bg-zinc-950 rounded-xl border border-dashed border-zinc-800">
-                    <i class="fa-solid fa-folder-open text-3xl text-zinc-600 mb-2"></i>
-                    <p class="text-xs font-medium text-zinc-400">Nenhum canhoto encontrado com os filtros informados.</p>
-                </div>
-            </div>
-
-            <div class="pt-2">
-                <button type="button" class="btnHome w-full py-2.5 text-xs font-bold text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors">
-                    <i class="fa-solid fa-arrow-left mr-1"></i> Voltar ao Menu Principal
-                </button>
-            </div>
-        </section>
-
-    </div>
-
-    <!-- Rodapé -->
-    <footer class="text-center py-4 mt-6 text-zinc-500 text-xs font-medium">
-        Desenvolvido por Movexa
-    </footer>
-
-    <!-- MODAL: Visualizador da Foto em Tela Cheia (Zoom e Download) -->
-    <div id="modalZoom" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
-        <div class="bg-zinc-900 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-zinc-800">
-            <div class="px-4 py-3 bg-zinc-950 text-white flex items-center justify-between border-b border-zinc-800">
-                <div class="text-xs font-medium text-zinc-300" id="zoomModalTitle">
-                    Visualização do Canhoto
-                </div>
-                <div class="flex items-center gap-2">
-                    <a id="btnZoomDownload" href="#" download="canhoto.jpg" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors">
-                        <i class="fa-solid fa-download"></i> Baixar Imagem
-                    </a>
-                    <button type="button" id="btnCloseZoom" class="text-zinc-400 hover:text-white p-1">
-                        <i class="fa-solid fa-xmark text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="p-4 flex-grow flex items-center justify-center overflow-auto bg-black">
-                <img id="zoomModalImg" src="" alt="Canhoto Ampliado" class="max-h-[75vh] object-contain rounded">
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast de Notificação -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-zinc-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-zinc-700 flex items-center gap-3 text-xs transition-all duration-300">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toastMessage">Operação realizada com sucesso!</span>
-    </div>
-
-    <!-- LÓGICA JAVASCRIPT -->
-    <script>
-        // --- CHAVE DO LOCALSTORAGE ---
-        const STORAGE_KEY = 'MOVEXA_CANHOTOS_DATA_V1';
-
-        // --- ESTADO DA APLICAÇÃO ---
-        let receipts = [];
-        let currentPhotoBase64 = '';
-
-        // --- ELEMENTOS DOM ---
-        const screenHome = document.getElementById('screenHome');
-        const screenAdd = document.getElementById('screenAdd');
-        const screenSearch = document.getElementById('screenSearch');
-
-        const btnGoAdd = document.getElementById('btnGoAdd');
-        const btnGoSearch = document.getElementById('btnGoSearch');
-        const btnHomes = document.querySelectorAll('.btnHome');
-
-        // Form Adicionar
-        const formAddReceipt = document.getElementById('formAddReceipt');
-        const addDate = document.getElementById('addDate');
-        const addPlate = document.getElementById('addPlate');
-        const addPhotoInput = document.getElementById('addPhotoInput');
-        const addPhotoPreview = document.getElementById('addPhotoPreview');
-        const addPhotoPreviewContainer = document.getElementById('addPhotoPreviewContainer');
-        const btnRemoveAddPhoto = document.getElementById('btnRemoveAddPhoto');
-
-        // Form Buscar
-        const formSearchReceipt = document.getElementById('formSearchReceipt');
-        const searchPlate = document.getElementById('searchPlate');
-        const searchDate = document.getElementById('searchDate');
-        const btnClearSearch = document.getElementById('btnClearSearch');
-        const searchResultsGrid = document.getElementById('searchResultsGrid');
-        const searchResultCount = document.getElementById('searchResultCount');
-        const searchEmptyState = document.getElementById('searchEmptyState');
-
-        // Backup
-        const btnExportBackup = document.getElementById('btnExportBackup');
-        const inputRestoreBackup = document.getElementById('inputRestoreBackup');
-
-        // Modal Zoom
-        const modalZoom = document.getElementById('modalZoom');
-        const zoomModalImg = document.getElementById('zoomModalImg');
-        const zoomModalTitle = document.getElementById('zoomModalTitle');
-        const btnZoomDownload = document.getElementById('btnZoomDownload');
-        const btnCloseZoom = document.getElementById('btnCloseZoom');
-
-        // --- INICIALIZAÇÃO ---
-        window.addEventListener('DOMContentLoaded', () => {
-            loadFromStorage();
-            setupEvents();
-            showScreen('home');
-        });
-
-        // --- NAVEGAÇÃO DE TELAS ---
-        function showScreen(screen) {
-            screenHome.classList.add('hidden');
-            screenAdd.classList.add('hidden');
-            screenSearch.classList.add('hidden');
-
-            if (screen === 'home') {
-                screenHome.classList.remove('hidden');
-            } else if (screen === 'add') {
-                resetAddForm();
-                addDate.value = new Date().toISOString().split('T')[0];
-                screenAdd.classList.remove('hidden');
-            } else if (screen === 'search') {
-                screenSearch.classList.remove('hidden');
-                performSearch();
-            }
-        }
-
-        // --- EVENTOS ---
-        function setupEvents() {
-            btnGoAdd.addEventListener('click', () => showScreen('add'));
-            btnGoSearch.addEventListener('click', () => showScreen('search'));
-            btnHomes.forEach(btn => btn.addEventListener('click', () => showScreen('home')));
-
-            // Manipulação de Foto no Form
-            addPhotoInput.addEventListener('change', handlePhotoSelect);
-            btnRemoveAddPhoto.addEventListener('click', clearPhotoSelection);
-
-            // Submeter Adição
-            formAddReceipt.addEventListener('submit', handleAddReceipt);
-
-            // Filtros de Busca
-            formSearchReceipt.addEventListener('submit', (e) => {
-                e.preventDefault();
-                performSearch();
-            });
-            btnClearSearch.addEventListener('click', () => {
-                searchPlate.value = '';
-                searchDate.value = '';
-                performSearch();
-            });
-
-            // Backup & Restauração
-            btnExportBackup.addEventListener('click', exportBackupJSON);
-            inputRestoreBackup.addEventListener('change', importBackupJSON);
-
-            // Modal Zoom
-            btnCloseZoom.addEventListener('click', () => modalZoom.classList.add('hidden'));
-        }
-
-        // --- COMPRESSÃO E PROCESSAMENTO DA IMAGEM (CANVAS) ---
-        function handlePhotoSelect(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                const img = new Image();
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-
-                    // Otimiza dimensões mantendo alta resolução e tamanho compacto de armazenamento
-                    const MAX = 1200;
-                    if (width > height && width > MAX) {
-                        height *= MAX / width;
-                        width = MAX;
-                    } else if (height > MAX) {
-                        width *= MAX / height;
-                        height = MAX;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Converte para JPEG compactado (0.75 de qualidade)
-                    currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.75);
-                    addPhotoPreview.src = currentPhotoBase64;
-                    addPhotoPreviewContainer.classList.remove('hidden');
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function clearPhotoSelection() {
-            currentPhotoBase64 = '';
-            addPhotoInput.value = '';
-            addPhotoPreview.src = '';
-            addPhotoPreviewContainer.classList.add('hidden');
-        }
-
-        function resetAddForm() {
-            formAddReceipt.reset();
-            clearPhotoSelection();
-        }
-
-        // --- SALVAR NOVO CANHOTO ---
-        function handleAddReceipt(e) {
-            e.preventDefault();
-
-            if (!currentPhotoBase64) {
-                showToast('A foto do canhoto é obrigatória!', 'error');
-                return;
-            }
-
-            const plateFormatted = addPlate.value.trim().toUpperCase();
-            const newRecord = {
-                id: Date.now().toString(),
-                date: addDate.value,
-                plate: plateFormatted,
-                photo: currentPhotoBase64,
-                createdAt: new Date().toISOString()
-            };
-
-            receipts.unshift(newRecord);
-            if (saveToStorage()) {
-                showToast('Canhoto salvo com sucesso!');
-                resetAddForm();
-                // Retorna à Tela Inicial conforme solicitado
-                showScreen('home');
-            }
-        }
-
-        // --- BUSCA E EXIBIÇÃO ---
-        function performSearch() {
-            const plateFilter = searchPlate.value.trim().toUpperCase();
-            const dateFilter = searchDate.value;
-
-            const filtered = receipts.filter(r => {
-                const matchesPlate = !plateFilter || r.plate.includes(plateFilter);
-                const matchesDate = !dateFilter || r.date === dateFilter;
-                return matchesPlate && matchesDate;
-            });
-
-            renderResults(filtered);
-        }
-
-        function renderResults(list) {
-            searchResultsGrid.innerHTML = '';
-            searchResultCount.textContent = `${list.length} encontrado(s)`;
-
-            if (list.length === 0) {
-                searchEmptyState.classList.remove('hidden');
-                return;
-            }
-
-            searchEmptyState.classList.add('hidden');
-
-            list.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden shadow-md flex flex-col justify-between';
-                
-                const formattedDate = formatDate(item.date);
-
-                card.innerHTML = `
-                    <div class="p-3 border-b border-zinc-800 bg-zinc-950 flex items-center justify-between">
-                        <div>
-                            <span class="text-xs font-extrabold text-white">PLACA: ${escapeHtml(item.plate)}</span>
-                            <p class="text-[10px] text-zinc-400">Data: ${formattedDate}</p>
-                        </div>
-                        <button onclick="deleteReceipt('${item.id}')" class="p-1.5 text-zinc-500 hover:text-rose-400 rounded transition-colors" title="Excluir">
-                            <i class="fa-solid fa-trash-can text-xs"></i>
-                        </button>
-                    </div>
-
-                    <div class="p-3 bg-black flex items-center justify-center cursor-pointer group relative min-h-[160px]" onclick="openZoomModal('${item.id}')">
-                        <img src="${item.photo}" class="max-h-44 object-contain rounded group-hover:opacity-90 transition-opacity" alt="Canhoto">
-                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
-                            <i class="fa-solid fa-magnifying-glass-plus"></i> Clique para Ampliar
-                        </div>
-                    </div>
-
-                    <div class="p-2.5 text-center bg-zinc-950 border-t border-zinc-800">
-                        <button onclick="openZoomModal('${item.id}')" class="text-xs font-bold text-orange-500 hover:text-orange-400 flex items-center justify-center gap-1 w-full">
-                            <i class="fa-solid fa-expand"></i> Visualizar em Tela Cheia
-                        </button>
-                    </div>
-                `;
-
-                searchResultsGrid.appendChild(card);
-            });
-        }
-
-        // --- EXCLUIR CANHOTO ---
-        window.deleteReceipt = function (id) {
-            if (confirm('Tem certeza de que deseja excluir este canhoto?')) {
-                receipts = receipts.filter(r => r.id !== id);
-                saveToStorage();
-                performSearch();
-                showToast('Canhoto excluído com sucesso.');
-            }
-        };
-
-        // --- MODAL ZOOM ---
-        window.openZoomModal = function (id) {
-            const item = receipts.find(r => r.id === id);
-            if (!item) return;
-
-            zoomModalImg.src = item.photo;
-            zoomModalTitle.textContent = `Canhoto Placa: ${item.plate} - Data: ${formatDate(item.date)}`;
-            btnZoomDownload.href = item.photo;
-            btnZoomDownload.download = `Canhoto_${item.plate}_${item.date}.jpg`;
-
-            modalZoom.classList.remove('hidden');
-        };
-
-        // --- BACKUP E RESTAURAÇÃO ---
-        function exportBackupJSON() {
-            if (receipts.length === 0) {
-                showToast('Não há canhotos cadastrados para exportar backup.', 'error');
-                return;
-            }
-
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(receipts, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            const dateStr = new Date().toISOString().split('T')[0];
-            downloadAnchor.setAttribute("download", `Backup_Canhotos_Movexa_${dateStr}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-
-            showToast('Backup exportado com sucesso!');
-        }
-
-        function importBackupJSON(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (event) {
-                try {
-                    const imported = JSON.parse(event.target.result);
-                    if (Array.isArray(imported)) {
-                        if (confirm(`Deseja restaurar ${imported.length} canhoto(s)? Dados existentes serão mantidos e unificados.`)) {
-                            // Unifica backups evitando duplicados por ID
-                            const currentIds = new Set(receipts.map(r => r.id));
-                            let countNew = 0;
-
-                            imported.forEach(item => {
-                                if (item.id && item.date && item.plate && item.photo) {
-                                    if (!currentIds.has(item.id)) {
-                                        receipts.push(item);
-                                        countNew++;
-                                    }
-                                }
-                            });
-
-                            // Ordena por data mais recente
-                            receipts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                            saveToStorage();
-                            showToast(`${countNew} novo(s) canhoto(s) restaurado(s) com sucesso!`);
-                            performSearch();
-                        }
-                    } else {
-                        showToast('Arquivo de backup inválido.', 'error');
-                    }
-                } catch (err) {
-                    showToast('Erro ao ler arquivo JSON de backup.', 'error');
-                    console.error(err);
-                }
-            };
-            reader.readAsText(file);
-            // Limpa o input
-            e.target.value = '';
-        }
-
-        // --- LOCALSTORAGE PERSISTÊNCIA ---
-        function loadFromStorage() {
-            try {
-                const stored = localStorage.getItem(STORAGE_KEY);
-                receipts = stored ? JSON.parse(stored) : [];
-            } catch (e) {
-                console.error('Erro ao ler LocalStorage:', e);
-                receipts = [];
-            }
-        }
-
-        function saveToStorage() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(receipts));
-                return true;
-            } catch (e) {
-                showToast('Erro ao salvar. O armazenamento local está cheio!', 'error');
-                console.error(e);
-                return false;
-            }
-        }
-
-        // --- UTILITÁRIOS ---
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const p = dateStr.split('-');
-            return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : dateStr;
-        }
-
-        function escapeHtml(str) {
-            return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMessage.textContent = msg;
-
-            if (type === 'error') {
-                toastIcon.className = 'fa-solid fa-circle-exclamation text-rose-400 text-base';
-            } else {
-                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-base';
-            }
-
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3500);
-        }
-    </script>
-</body>
-</html>
+            <button onclick="hideToast()" class="text-zinc-400 hover:text-white ml-4">
+                <i class
